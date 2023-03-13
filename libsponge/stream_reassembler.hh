@@ -2,25 +2,20 @@
 #define SPONGE_LIBSPONGE_STREAM_REASSEMBLER_HH
 
 #include "byte_stream.hh"
-// #include "positionlinklist.hh"
+
 #include <cstdint>
 #include <string>
-#include <map>
 
 //! \brief A class that assembles a series of excerpts from a byte stream (possibly out of order,
 //! possibly overlapping) into an in-order byte stream.
 class StreamReassembler {
   private:
     // Your code here -- add private members as necessary.
-    // mergestream merge;
-    size_t lastindexofsavedoutput = 0;
-    size_t _sizeofunassemblestring = 0;
+
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
-    std::map<std::string,std::pair<int,int>> unreassemblestrings;
 
   public:
-    const std::string&& merge(const std::string& str,int index);
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
     //! \note This capacity limits both the bytes that have been reassembled,
     //! and those that have not yet been reassembled.

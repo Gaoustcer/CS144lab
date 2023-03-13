@@ -8,6 +8,7 @@
 //! Bytes are written on the "input" side and read from the "output"
 //! side.  The byte stream is finite: the writer can end the input,
 //! and then no more bytes can be written.
+#define DEBUG
 class ByteStream {
   private:
     // Your code here -- add private members as necessary.
@@ -16,8 +17,13 @@ class ByteStream {
     // all, but if any of your tests are taking longer than a second,
     // that's a sign that you probably want to keep exploring
     // different approaches.
-
-    bool _error{};  //!< Flag indicating that the stream suffered an error.
+    size_t _capacity{0};
+    // int _currentsize;
+    bool _eof{false};
+    bool _error{false};  //!< Flag indicating that the stream suffered an error.
+    std::string storestr{std::string()};
+    size_t _bytehaswriten{0};
+    size_t _bytehasread{0};
 
   public:
     //! Construct a stream with room for `capacity` bytes.

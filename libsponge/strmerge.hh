@@ -12,9 +12,10 @@ private:
     std::map<int,std::string> strindexmapping;
     size_t unreassembleidbyte;    
 public:
+    int numberofmapping();
     void debug();
     MergeString();
-    int merge(const std::string& mergestr,int startindex,std::string &retstr,int lastbyteindex);
+    void merge(const std::string& mergestr,int startindex,std::string &retstr,int lastbyteindex);
 };
 
 INTERCONDITION interact(const std::string&,const std::string&,int,int);

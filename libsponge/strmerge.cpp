@@ -15,14 +15,19 @@ void MergeString::debug(){
     }
 }
 
-int MergeString::merge(const std::string &mergestr,int startindex,std::string &retstr,int lastbyteindex){
+int MergeString::numberofmapping(){
+    return strindexmapping.size();
+}
+
+void MergeString::merge(const std::string &mergestr,int startindex,std::string &retstr,int lastbyteindex){
     INTERCONDITION type;
-    std::cout << "merge str" << mergestr << std::endl;
+    // std::cout << "merge str " << mergestr << std::endl;
     size_t headstrcount = 0;
-    
+
     for(auto iteration = strindexmapping.begin();iteration != strindexmapping.end();iteration++){
         std::string & newstr = retstr;
         type = interact(mergestr,iteration->second,startindex,iteration->first);
+        // std::cout << "type is " << type << std::endl;
         switch (type)
         {
         case NOTINTERACT /* constant-expression */:
@@ -45,17 +50,23 @@ int MergeString::merge(const std::string &mergestr,int startindex,std::string &r
             break;
         case INTERACTTAIL:
             headstrcount = startindex - iteration -> first;
+            // std:: cout << "tail length is " << headstrcount << std::endl;
             newstr = iteration -> second.substr(0,headstrcount) + mergestr;
+            // std:: cout << ""
             unreassembleidbyte -= iteration -> second.size();
+            // std::cout << "map size " << strindexmapping.size() << std::endl;
             strindexmapping.erase(iteration);
+            // std::cout << "map size " << strindexmapping.size() << std::endl;
+            // std::cout << "insert new str " << newstr << std::endl;
             this -> merge(newstr,iteration -> first,retstr,lastbyteindex);
             break;
         default:
             std::cout << "default errror\n";            
             break;
         }
-        if(type == NOTINTERACT || type == CONTAINEDWITHIN){
-            return type;
+        if(type != NOTINTERACT || type != CONTAINEDWITHIN){
+            return ;
+            // return type;
         }
     }    
     if(startindex <= lastbyteindex && startindex + mergestr.size() > lastbyteindex){
@@ -84,9 +95,15 @@ INTERCONDITION interact(const std::string &insertstr,const std::string &targetst
     int targetend = targetstr.size() + targetindex;
     int minend = std::min(insertend,targetend);
     INTERCONDITION type;
-    if(minend >= maxstart){
+    if(minend < maxstart){
         // type = 
         type = NOTINTERACT;
+    }
+    else if(insertend == targetindex){
+        return INTERACTTAIL;
+    }
+    else if(insertindex == targetend){
+        return INERACTHEAD;
     }
     else{
         if(targetend >= insertend && targetindex <= insertend){
