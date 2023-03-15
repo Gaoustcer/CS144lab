@@ -72,7 +72,7 @@ void MergeString::merge(const std::string &mergestr,int startindex,std::string &
     if(startindex <= lastbyteindex && startindex + mergestr.size() > lastbyteindex){
         retstr = mergestr.substr(lastbyteindex - startindex);
     }
-    else if (startindex > lastbyteindex)
+    else if (startindex >= lastbyteindex)
     {
         unreassembleidbyte += mergestr.size();
         strindexmapping[startindex] = mergestr;
