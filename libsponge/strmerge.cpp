@@ -2,7 +2,10 @@
 #include <string>
 #include <map>
 #include <iostream>
-
+#include <limits>
+#include <typeinfo>
+// int x;
+// type(x
 MergeString::MergeString(){
     unreassembleidbyte = 0;
     strindexmapping = std::map<int,std::string>();
@@ -15,18 +18,45 @@ void MergeString::debug(){
     }
 }
 
+void MergeString::insert(std::string &str,size_t index){
+    unreassembleidbyte += str.size();
+    strindexmapping[index] = str;
+    // insert a string with start index
+}
+
 int MergeString::numberofmapping(){
     return strindexmapping.size();
 }
 
-void MergeString::merge(const std::string &mergestr,int startindex,std::string &retstr,int lastbyteindex){
+
+std::pair<size_t,std::string> MergeString::getsmallestindexsubstr(){
+// iteration through the whole map and find the smallest <index,str> pair
+    if(strindexmapping.begin() == strindexmapping.end()){
+        return std::pair<size_t,std::string>(0,std::string(""));
+    }
+    // auto iterator = strindexmapping.begin();
+    auto smallestiterator = strindexmapping.begin();
+    size_t logsmallest = std::numeric_limits<size_t>::max();
+    for(auto iterator = strindexmapping.begin();iterator != strindexmapping.end();iterator++){
+        if(iterator->first <= logsmallest){
+            smallestiterator = iterator;
+            logsmallest = iterator -> first;
+        }
+    }
+    // delete and remove the pair in the mapping
+    unreassembleidbyte -= smallestiterator->second.size();
+    strindexmapping.erase(smallestiterator);
+    return *smallestiterator;
+}
+void MergeString::merge(const std::string &data,int startindex){
+    std::string strmerge = data;
     INTERCONDITION type;
     // std::cout << "merge str " << mergestr << std::endl;
     size_t headstrcount = 0;
-
+    // std::string & 
     for(auto iteration = strindexmapping.begin();iteration != strindexmapping.end();iteration++){
-        std::string & newstr = retstr;
-        type = interact(mergestr,iteration->second,startindex,iteration->first);
+        // std::string & newstr = retstr;
+        type = interact(data,iteration->second,startindex,iteration->first);
         // std::cout << "type is " << type << std::endl;
         switch (type)
         {
@@ -37,28 +67,26 @@ void MergeString::merge(const std::string &mergestr,int startindex,std::string &
             // return ;            
             break;
         case BECONTAINEDWITHOUT:
+            // itertor string contain data from head to tail
             unreassembleidbyte -= iteration -> second.size();
             strindexmapping.erase(iteration);
-            this->merge(mergestr,startindex,retstr,lastbyteindex);
+            this->merge(strmerge,startindex);
             break;
         case INERACTHEAD:
+            // data is in front of iterator
             headstrcount = iteration -> first - startindex;
-            newstr = mergestr.substr(0,headstrcount) + iteration -> second;
+            strmerge = data.substr(0,headstrcount) + (iteration -> second);
             unreassembleidbyte -= iteration -> second.size();
             strindexmapping.erase(iteration);
-            this->merge(newstr,startindex,retstr,lastbyteindex);
+            this->merge(strmerge,startindex);
             break;
         case INTERACTTAIL:
             headstrcount = startindex - iteration -> first;
             // std:: cout << "tail length is " << headstrcount << std::endl;
-            newstr = iteration -> second.substr(0,headstrcount) + mergestr;
-            // std:: cout << ""
+            strmerge = iteration -> second.substr(0,headstrcount) + data;
             unreassembleidbyte -= iteration -> second.size();
-            // std::cout << "map size " << strindexmapping.size() << std::endl;
             strindexmapping.erase(iteration);
-            // std::cout << "map size " << strindexmapping.size() << std::endl;
-            // std::cout << "insert new str " << newstr << std::endl;
-            this -> merge(newstr,iteration -> first,retstr,lastbyteindex);
+            this -> merge(strmerge,iteration -> first);
             break;
         default:
             std::cout << "default errror\n";            
@@ -69,19 +97,8 @@ void MergeString::merge(const std::string &mergestr,int startindex,std::string &
             // return type;
         }
     }    
-    if(startindex <= lastbyteindex && startindex + mergestr.size() > lastbyteindex){
-        retstr = mergestr.substr(lastbyteindex - startindex);
-    }
-    else if (startindex >= lastbyteindex)
-    {
-        unreassembleidbyte += mergestr.size();
-        strindexmapping[startindex] = mergestr;
-        retstr = std::string();
-        /* code */
-    }
-    else{
-        retstr = std::string();
-    }
+    // find no interaction string
+    strindexmapping[startindex] = data;
     
 }
 

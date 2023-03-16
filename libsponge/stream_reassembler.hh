@@ -16,7 +16,9 @@ class StreamReassembler {
 
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
-        
+    size_t _lastbyterindex;
+    size_t _unreassembelebyte;
+    MergeString _Merge;    
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
     //! \note This capacity limits both the bytes that have been reassembled,
