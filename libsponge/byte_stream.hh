@@ -8,7 +8,7 @@
 //! Bytes are written on the "input" side and read from the "output"
 //! side.  The byte stream is finite: the writer can end the input,
 //! and then no more bytes can be written.
-#define DEBUG
+// #define DEBUG
 class ByteStream {
   private:
     // Your code here -- add private members as necessary.

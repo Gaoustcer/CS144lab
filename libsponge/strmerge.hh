@@ -16,8 +16,8 @@ enum INTERCONDITION{INERACTHEAD=1,INTERACTTAIL,CONTAINEDWITHIN,BECONTAINEDWITHOU
 // 5 condition of interaction/no interaction
 class MergeString{
 private:
-    std::map<int,std::string> strindexmapping; // new interact with each other within the map
-    size_t unreassembleidbyte;    // the size of unassembled string in the map
+    std::map<int,std::string> strindexmapping{std::map<int,std::string>()}; // new interact with each other within the map
+    size_t unreassembleidbyte{0};    // the size of unassembled string in the map
 public:
     int numberofmapping(); // the number of integar-string pair in strindexmaping
     void debug();

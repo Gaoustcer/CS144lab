@@ -14,11 +14,12 @@ class StreamReassembler {
   private:
     // Your code here -- add private members as necessary.
 
-    ByteStream _output;  //!< The reassembled in-order byte stream
-    size_t _capacity;    //!< The maximum number of bytes
-    size_t _lastbyterindex;
-    size_t _unreassembelebyte;
-    MergeString _Merge;    
+    ByteStream _output{ByteStream(0)};  //!< The reassembled in-order byte stream
+    size_t _capacity{0};    //!< The maximum number of bytes
+    size_t _lastbyterindex{0};
+    size_t _unreassembelebyte{0};
+    size_t _lastbytesteam{0};
+    MergeString _Merge{MergeString()};    
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
     //! \note This capacity limits both the bytes that have been reassembled,
