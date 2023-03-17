@@ -48,7 +48,7 @@ std::pair<size_t,std::string> MergeString::getsmallestindexsubstr(){
     strindexmapping.erase(smallestiterator);
     return *smallestiterator;
 }
-void MergeString::merge(const std::string &data,int startindex){
+void MergeString::merge(const std::string &data,size_t startindex){
     std::string strmerge = data;
     INTERCONDITION type;
     // std::cout << "merge str " << mergestr << std::endl;
