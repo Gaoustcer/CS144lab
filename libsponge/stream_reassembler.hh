@@ -2,37 +2,16 @@
 #define SPONGE_LIBSPONGE_STREAM_REASSEMBLER_HH
 
 #include "byte_stream.hh"
-
+#include <queue>
 #include <cstdint>
 #include <string>
 #include <map>
+#include <limits>
 // #include "strmerge.hh"
 #define DEBUG
-enum INTERCONDITION{INERACTHEAD=1,INTERACTTAIL,CONTAINEDWITHIN,BECONTAINEDWITHOUT,NOTINTERACT};
-// 5 condition of interaction/no interaction
-class MergeString{
-private:
-    std::map<size_t,std::string> strindexmapping{std::map<size_t,std::string>()}; // new interact with each other within the map
-    size_t unreassembleidbyte{0};    // the size of unassembled string in the map
-public:
-    // MergeString(){}
-    int numberofmapping(); // the number of integar-string pair in strindexmaping
-    void debug();
-    size_t sizeofunreassemblebyte() const{
-        return unreassembleidbyte;
-    }
-    std::pair<size_t,std::string> getsmallestindexsubstr();
-    // size_t howmanybyteleft() const{
-    //     return unreassembleidbyte;
-    // }
-    void insert(std::string &str,size_t index);
-    MergeString();
-    
-    void merge(const std::string& mergestr,size_t startindex);// lastbyteindex is the index of last byte which has been stored in Bytestream
-};
 
-INTERCONDITION interact(const std::string&,const std::string&,int,int);
 
+void print(std::deque<char>& q);
 
 //! \brief A class that assembles a series of excerpts from a byte stream (possibly out of order,
 //! possibly overlapping) into an in-order byte stream.
@@ -42,16 +21,18 @@ class StreamReassembler {
 
     ByteStream _output{ByteStream(0)};  //!< The reassembled in-order byte stream
     size_t _capacity{0};    //!< The maximum number of bytes
-    size_t _lastbyterindex{0};
-    size_t _unreassembelebyte{0};
-    size_t _lastbytesteam{0};
-    MergeString _Merge{MergeString()};    
+    std::deque<char> _unassemblestr{}; // content
+    std::deque<bool> _unassembleindicator{}; 
+    size_t _lasteofbyte{std::numeric_limits<size_t>::max()};
+    size_t _unassemblebytecount{0}; // How many byte has not been assembled
+    size_t _lastbyteassemble{0}; // How many byte has been writen into ByteStream Object
+    
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
     //! \note This capacity limits both the bytes that have been reassembled,
     //! and those that have not yet been reassembled.
     StreamReassembler(const size_t capacity);
-
+    void _writeintoBytestream();
     //! \brief Receive a substring and write any newly contiguous bytes into the stream.
     //!
     //! The StreamReassembler will stay within the memory limits of the `capacity`.
