@@ -2,6 +2,7 @@
 #define SPONGE_LIBSPONGE_BYTE_STREAM_HH
 
 #include <string>
+#include <iostream>
 
 //! \brief An in-order byte stream.
 
@@ -26,6 +27,9 @@ class ByteStream {
     size_t _bytehasread{0};
 
   public:
+    void Debug(){
+      std::cout << "size of storestr " <<storestr.size() << " " << storestr << " " << std::endl;
+    }
     //! Construct a stream with room for `capacity` bytes.
     ByteStream(const size_t capacity);
 

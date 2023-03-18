@@ -110,6 +110,7 @@ void MergeString::merge(const std::string &data,size_t startindex){
     }    
     // find no interaction string
     strindexmapping[startindex] = data;
+    unreassembleidbyte += data.size();
     
 }
 
@@ -155,7 +156,7 @@ INTERCONDITION interact(const std::string &insertstr,const std::string &targetst
 
 StreamReassembler::StreamReassembler(const size_t capacity) : _output(capacity), _capacity(capacity) {
     _lastbyterindex = 0;
-    _lastbytesteam = 0;
+    _lastbytesteam = std::numeric_limits<size_t>::max();
     _Merge = MergeString();
     _unreassembelebyte = _Merge.sizeofunreassemblebyte();
 }
@@ -167,37 +168,90 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
     // std::string & str = std::string("");
     std::string str;
     size_t start = static_cast<size_t>(index);
+    if(eof){
+        _lastbytesteam = index + data.size();
+    }
     #ifdef DEBUG
-    std::cout << "data is " << data.size() << " index is " << index  << " eof is " << eof << std::endl;
+    std::cout << "merge size " << _Merge.numberofmapping() << " data size is " << data.size() << " " << data << " index is " << index  << " eof is " << eof << std::endl;
+    _output.Debug();
     #endif
     _Merge.merge(data,start);
+    _unreassembelebyte = _Merge.sizeofunreassemblebyte();
+    #ifdef DEBUG
+    _Merge.debug();
+    #endif
+    std::cout << "Iterator " << _unreassembelebyte << endl;
+    while(_unreassembelebyte){
+
+        auto smallindex = _Merge.getsmallestindexsubstr();
+        #ifdef DEBUG
+        std::cout << "smallest " << smallindex.first << " str is " << smallindex.second  << " last byte index " << _lastbyterindex << std::endl;
+        #endif
+        if(smallindex.first <= _lastbyterindex && smallindex.first + smallindex.second.size() > _lastbyterindex){
+            std::cout << "write " << smallindex.second << std::endl;
+            _output.write(smallindex.second.substr(_lastbyterindex - smallindex.first));
+            _lastbyterindex = _output.bytes_written() + 1;
+            if(_lastbyterindex >= _lastbytesteam){
+                _output.end_input();
+            }
+            // return ;
+        }
+        else if(smallindex.first > _lastbyterindex){
+            // insert it into merge
+            _Merge.insert(smallindex.second,smallindex.first);
+            _unreassembelebyte = _Merge.sizeofunreassemblebyte();
+            return ;
+        }
+        _unreassembelebyte = _Merge.sizeofunreassemblebyte();
+        // else if(smallindex.first + smallindex.second.size() > _lastbyterindex){
+        //     size_t insertsize = std::max<size_t>(_lastbyterindex - smallindex.first,0);
+        //     size_t concatsize = smallindex.first + smallindex.second.size() - _lastbyterindex;
+        //     _Merge.insert();
+        // }
+    }
+    _unreassembelebyte = _Merge.sizeofunreassemblebyte();
+    return;
+    
     if(eof){
         _lastbytesteam = start + data.size();
     }
     // auto smallestpair = _Merge.getsmallestindexsubstr();
     while(1){
+        
+        if(_Merge.numberofmapping() == 0){
+            return;
+        }
+        std::cout << "_merge size " << _Merge.numberofmapping() << endl;
         auto smallestpair = _Merge.getsmallestindexsubstr();
         #ifdef DEBUG
+        std::cout << "Debug the merge object\n";
+        _Merge.debug();
+        
         std::cout << "iterator " << smallestpair.second.size()  << " first is " << smallestpair.first << " _last is " << _lastbyterindex << std::endl;
         #endif
-        if(smallestpair.first >= _lastbyterindex){
+        if(smallestpair.first > _lastbyterindex){
             // insert it into _Mergestr
+            #ifdef DEBUG
+            std::cout << "insert " << smallestpair.second.size() << std::endl;
+            std::cout << "return after insert\n";
+            #endif
             _Merge.insert(smallestpair.second,smallestpair.first);
             _unreassembelebyte = _Merge.sizeofunreassemblebyte();
+            
             return ;
         }   
         else{
             // try to merge with Bytestream
             size_t concatsize = smallestpair.second.size() - \
                 (_lastbyterindex - smallestpair.first);
-            size_t writesize;
+            // size_t writesize;
             
             if(concatsize <= _output.remaining_capacity()){
                 _output.write(smallestpair.second.substr(_lastbyterindex - smallestpair.first));
-                writesize = smallestpair.second.size() + smallestpair.first;
-                if(writesize == _lastbytesteam){
-                    _output.end_input();
-                }
+                // writesize = smallestpair.second.size() + smallestpair.first;
+                // if(writesize == _lastbytesteam){
+                //     _output.end_input();
+                // }
                 // writesize 
             }
             else{
@@ -214,6 +268,9 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
                 // }
             }
             _lastbyterindex = _output.bytes_written() + 1;
+            if(_lastbyterindex >= _lastbytesteam){
+                _output.end_input();
+            }
         }
     }
     // d
@@ -222,7 +279,7 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
 
 size_t StreamReassembler::unassembled_bytes() const { 
     // CONST class method could only call const member
-    return _unreassembelebyte;
+    return _unreassembelebyte + 1;
 }
 
 bool StreamReassembler::empty() const { return {_unreassembelebyte == 0}; }
