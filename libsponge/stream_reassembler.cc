@@ -22,7 +22,9 @@ void print(std::deque<char> &q){
   std::cout << std::endl;
 }
 StreamReassembler::StreamReassembler(const size_t capacity) : _output(capacity), _capacity(capacity) {
-    // std::cout << "init\n";
+    #ifdef DEBUG
+    std::cout << "init\n";
+    #endif
     _lastbyteassemble = 0;
     _unassemblebytecount = 0;
     _unassembleindicator = std::deque<bool>(0);
@@ -66,16 +68,23 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
         _output.write(data);
         size_t size = data.size();
         while(size && _unassemblestr.size()){
+            if(_unassembleindicator.front()){
+                _unassemblebytecount -= 1;
+            }
             _unassemblestr.pop_front();
             _unassembleindicator.pop_front();
             size--;
+            // _unassemblebytecount -= 1;
         }
+        // _unassemblebytecount -= size;
         std::string s;
         while(_unassemblestr.size() && _unassembleindicator.front()){
             s.insert(s.end(),_unassemblestr.front());
             _unassemblestr.pop_front();
             _unassembleindicator.pop_front();
+            _unassemblebytecount -= 1;
         }
+        // _unassemblebytecount -= s.size();
         _output.write(s);
         _lastbyteassemble = _output.bytes_written();
         if(_lastbyteassemble >= _lasteofbyte){
@@ -101,11 +110,13 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
             if(_unassembleindicator.at(dataindexhasbeeninthequeue) == false){
                 _unassembleindicator.at(dataindexhasbeeninthequeue) = true;
                 _unassemblestr.at(dataindexhasbeeninthequeue) = data[id];
+                _unassemblebytecount += 1;
             }
         }
         while(_unassemblestr.size() < lowerboundqueuelength + data.size()){
             _unassemblestr.push_back(data[id]);
             _unassembleindicator.push_back(true);
+            _unassemblebytecount += 1;
             id++;
         }
     }

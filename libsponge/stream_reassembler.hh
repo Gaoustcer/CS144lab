@@ -8,7 +8,7 @@
 #include <map>
 #include <limits>
 // #include "strmerge.hh"
-#define DEBUG
+// #define DEBUG
 
 
 void print(std::deque<char>& q);
