@@ -22,7 +22,7 @@ void print(std::deque<char> &q){
   std::cout << std::endl;
 }
 StreamReassembler::StreamReassembler(const size_t capacity) : _output(capacity), _capacity(capacity) {
-    std::cout << "init\n";
+    // std::cout << "init\n";
     _lastbyteassemble = 0;
     _unassemblebytecount = 0;
     _unassembleindicator = std::deque<bool>(0);
@@ -52,18 +52,23 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
     if(eof == true){
         _lasteofbyte = data.size() + index;
     }
+    #ifdef DEBUG
     std::cout << "data push " << data << " index " << index << " eof " << eof << " " <<  _lastbyteassemble << std::endl;
+    #endif
     if(index < _lastbyteassemble && data.size() + index > _lastbyteassemble){
-        this->push_substring(data.substr(_lasteofbyte - index),_lasteofbyte,eof);
+        // std::cout << "cut str " << data.substr(_lasteofbyte - index) << std::endl;
+        this->push_substring(data.substr(_lastbyteassemble - index),_lastbyteassemble,eof);
         return;
     }
     else if(index == _lastbyteassemble){
         // special case
+        // std::cout << "insert str with same assemble " << data << std::endl;
         _output.write(data);
         size_t size = data.size();
         while(size && _unassemblestr.size()){
             _unassemblestr.pop_front();
             _unassembleindicator.pop_front();
+            size--;
         }
         std::string s;
         while(_unassemblestr.size() && _unassembleindicator.front()){
@@ -76,6 +81,7 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
         if(_lastbyteassemble >= _lasteofbyte){
             _output.end_input();
         }
+        return;
     }
     else if(data.size() + index <= _lastbyteassemble){
         return;
@@ -97,7 +103,7 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
                 _unassemblestr.at(dataindexhasbeeninthequeue) = data[id];
             }
         }
-        while(_unassemblestr.size() <= lowerboundqueuelength + data.size()){
+        while(_unassemblestr.size() < lowerboundqueuelength + data.size()){
             _unassemblestr.push_back(data[id]);
             _unassembleindicator.push_back(true);
             id++;
