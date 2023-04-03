@@ -1,5 +1,8 @@
 #include "wrapping_integers.hh"
 #include <limits>
+#include <cassert>
+#include <iostream>
+
 // Dummy implementation of a 32-bit wrapping integer
 
 // For Lab 2, please replace with a real implementation that passes the
@@ -33,28 +36,25 @@ uint64_t unwrap(WrappingInt32 n, WrappingInt32 isn, uint64_t checkpoint) {
     // seqno -> absolute seqno
     // to close to checkpoint in which range
     // DUMMY_CODE(n, isn, checkpoint);
-    uint64_t index = 0;
-    if(n.raw_value() < isn.raw_value()){
-        index = static_cast<uint64_t>(UINT32_MAX + 1 + n.raw_value() - isn.raw_value()); 
+    uint32_t id = n - isn;
+    uint64_t index = static_cast<uint64_t>(id);
+    if(index > checkpoint){
+        return {index};
+    }
+    else{
+        // need to fill the gap between checkpoint by add several INT32_MAX
+        uint64_t gap = (checkpoint - index) >> 32;
+        // cout << gap << " " << checkpoint << endl;
+        // gap * 1 >> 32 + index < checkpoint
+        index += gap * (1ul << 32);
+        assert(index < checkpoint);
+        if(checkpoint - index > (1ul <<  31)){
+            return {index + (1ul << 32)};
+        } 
+        else{
+            return {index};
+        }
 
-        // There must be an index rewind
-    }
-    else{
-        index = static_cast<uint64_t>(n.raw_value() - isn.raw_value());
-    }
-    uint64_t lowerbound;
-    uint64_t higherbound = ((checkpoint + 1) >> 32) << 32;
-    if((checkpoint >> 32) == 0){
-        lowerbound = 0;
-    }
-    else{
-        lowerbound = (((checkpoint + 1) >> 32) - 1) << 32;
-    }
-    if(index > (UINT32_MAX > 1)){
-        return {index + lowerbound};
-    }
-    else{
-        return {index + higherbound};
     }
 }
 // UINT32_MAX
