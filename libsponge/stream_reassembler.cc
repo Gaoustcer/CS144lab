@@ -59,14 +59,17 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
     #endif
     if(index < _lastbyteassemble && data.size() + index > _lastbyteassemble){
         // std::cout << "cut str " << data.substr(_lasteofbyte - index) << std::endl;
+        // substring data[_lastbyteassemble - index:]
         this->push_substring(data.substr(_lastbyteassemble - index),_lastbyteassemble,eof);
         return;
     }
     else if(index == _lastbyteassemble){
-        // special case
+        // merge string into Bytestring
+        // special case,we does not deal with situation that Bytestream is full
         // std::cout << "insert str with same assemble " << data << std::endl;
         _output.write(data);
         size_t size = data.size();
+        // push out the bool indicator 
         while(size && _unassemblestr.size()){
             if(_unassembleindicator.front()){
                 _unassemblebytecount -= 1;

@@ -7,7 +7,7 @@
 #include "wrapping_integers.hh"
 
 #include <optional>
-
+#include <stdint.h>
 //! \brief The "receiver" part of a TCP implementation.
 
 //! Receives and reassembles segments into a ByteStream, and computes
@@ -15,17 +15,22 @@
 //! remote TCPSender.
 class TCPReceiver {
     //! Our data structure for re-assembling bytes.
+    uint64_t _checkpoint;
     StreamReassembler _reassembler;
-
+    // bool _syn_status;
     //! The maximum number of bytes we'll store.
     size_t _capacity;
+    // uint64_t _checkpoint;
+    std::optional<WrappingInt32> _isn;
+    // uint64_t _isn;
+    // WrappingInt32 _isn;
 
   public:
     //! \brief Construct a TCP receiver
     //!
     //! \param capacity the maximum number of bytes that the receiver will
     //!                 store in its buffers at any give time.
-    TCPReceiver(const size_t capacity) : _reassembler(capacity), _capacity(capacity) {}
+    TCPReceiver(const size_t capacity) : _checkpoint(0),_reassembler(capacity), _capacity(capacity),_isn(std::nullopt) {}
 
     //! \name Accessors to provide feedback to the remote TCPSender
     //!@{
