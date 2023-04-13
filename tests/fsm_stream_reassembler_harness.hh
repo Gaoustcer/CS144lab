@@ -57,7 +57,9 @@ struct BytesAvailable : public ReassemblerExpectation {
         std::string data = reassembler.stream_out().read(_bytes.size());
         if (data != _bytes) {
             std::ostringstream ss;
-            ss << "The reassembler was expected to have  bytes \"" << _bytes << "\", but there were \"" << data << "\"";
+            
+            ss << "Error information \n"; 
+            ss << "The reassembler was expected to have  bytes \"" << _bytes << " with size " << _bytes.size() << "\", but there were the str \""  << " with size " << data.size() <<  "\"";
             throw ReassemblerExpectationViolation(ss.str());
         }
     }

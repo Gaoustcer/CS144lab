@@ -7,6 +7,7 @@
 #include <string>
 #include <map>
 #include <limits>
+#include <vector>
 // #include "strmerge.hh"
 // #define DEBUG
 
@@ -31,8 +32,10 @@ class StreamReassembler {
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
     //! \note This capacity limits both the bytes that have been reassembled,
     //! and those that have not yet been reassembled.
+    size_t firstunassemble();
     StreamReassembler(const size_t capacity);
     void _writeintoBytestream();
+    
     //! \brief Receive a substring and write any newly contiguous bytes into the stream.
     //!
     //! The StreamReassembler will stay within the memory limits of the `capacity`.
