@@ -50,7 +50,7 @@ void StreamReassembler::_writeintoBytestream(){
     _output.write(s);
     return ;
 }
-size_t StreamReassembler::firstunassemble(){
+size_t StreamReassembler::firstunassemble() const{
     size_t index = 0;
     while(1){
         if(index >= _unassembleindicator.size() || *(_unassembleindicator.begin() + index) == false){

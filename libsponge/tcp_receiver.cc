@@ -1,5 +1,5 @@
 #include "tcp_receiver.hh"
-
+#include <cstdlib>
 // Dummy implementation of a TCP receiver
 
 // For Lab 2, please replace with a real implementation that passes the
@@ -17,22 +17,22 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
     if(header.syn && !_isn.has_value()){
         // received syn from peer and _syn status is false
         // make the connection
+        _isn = static_cast<WrappingInt32>(rand());
         _checkpoint = static_cast<uint64_t>(header.seqno.raw_value()) + 1;
-        _isn = header.seqno;
     }
-    else if(_isn.has_value() && header.fin){
-        // disconnection the TCP connection
-        _isn = nullopt;
-        _checkpoint = 0;
-        uint64_t index = unwrap(header.seqno,_isn.value(),_checkpoint);
-        _reassembler.push_substring(string(),index,true);
-    }
-    else if(_isn.has_value() && !header.fin){
-        // write object into reassemble
-        _checkpoint += buffer.size();
-        uint64_t index = unwrap(header.seqno,_isn.value(),_checkpoint);
-        _reassembler.push_substring(buffer.copy(), index, false);
-    }
+    // else if(_isn.has_value() && header.fin){
+    //     // disconnection the TCP connection
+    //     _isn = nullopt;
+    //     _checkpoint = 0;
+    //     uint64_t index = unwrap(header.seqno,_isn.value(),_checkpoint);
+    //     _reassembler.push_substring(string(),index,true);
+    // }
+    // else if(_isn.has_value() && !header.fin){
+    //     // write object into reassemble
+    //     _checkpoint += buffer.size();
+    //     uint64_t index = unwrap(header.seqno,_isn.value(),_checkpoint);
+    //     _reassembler.push_substring(buffer.copy(), index, false);
+    // }
     // call unwrap to write into reassemble 
     // push_substring(string &,uint64_t,eof);
     // uint64_t = unwrap(WrappingInt32 n,WrappingInt32 isn,uint64_t checkpoint)
@@ -46,9 +46,11 @@ optional<WrappingInt32> TCPReceiver::ackno() const {
     }
     else{
         // call wrap to get next byte
-        return {_isn.value()};
+        // return {_isn.value()};
+        
     }
         // return {}; 
 }
 
-size_t TCPReceiver::window_size() const { return {}; }
+size_t TCPReceiver::window_size() const { 
+    return _capacity - _reassembler.firstunassemble(); }
