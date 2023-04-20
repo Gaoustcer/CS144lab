@@ -32,7 +32,7 @@ class StreamReassembler {
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
     //! \note This capacity limits both the bytes that have been reassembled,
     //! and those that have not yet been reassembled.
-    size_t firstunassemble() const;
+    size_t firstunassemble();
     StreamReassembler(const size_t capacity);
     void _writeintoBytestream();
     

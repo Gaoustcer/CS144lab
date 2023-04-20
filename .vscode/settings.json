@@ -50,6 +50,14 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "bitset": "cpp",
+        "codecvt": "cpp",
+        "scoped_allocator": "cpp",
+        "thread": "cpp",
+        "regex": "cpp",
+        "typeindex": "cpp",
+        "valarray": "cpp",
+        "charconv": "cpp"
     }
 }

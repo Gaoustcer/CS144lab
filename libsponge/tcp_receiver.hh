@@ -8,6 +8,7 @@
 
 #include <optional>
 #include <stdint.h>
+#include <iostream>
 //! \brief The "receiver" part of a TCP implementation.
 
 //! Receives and reassembles segments into a ByteStream, and computes
@@ -15,7 +16,7 @@
 //! remote TCPSender.
 class TCPReceiver {
     //! Our data structure for re-assembling bytes.
-    uint64_t _checkpoint;
+    // uint64_t _checkpoint;
     StreamReassembler _reassembler;
     // bool _syn_status;
     //! The maximum number of bytes we'll store.
@@ -30,7 +31,7 @@ class TCPReceiver {
     //!
     //! \param capacity the maximum number of bytes that the receiver will
     //!                 store in its buffers at any give time.
-    TCPReceiver(const size_t capacity) : _checkpoint(0),_reassembler(capacity), _capacity(capacity),_isn(std::nullopt) {}
+    TCPReceiver(const size_t capacity) :_reassembler(capacity), _capacity(capacity),_isn(std::nullopt) {std::cout << "Initial TCP Receiver\n";}
 
     //! \name Accessors to provide feedback to the remote TCPSender
     //!@{

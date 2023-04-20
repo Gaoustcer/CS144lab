@@ -14,12 +14,20 @@ using namespace std;
 void TCPReceiver::segment_received(const TCPSegment &seg) {
     const TCPHeader & header = seg.header();
     const Buffer & buffer = seg.payload();
+    cout <<"string is " << buffer.copy() << " header is " << header.syn << endl;
     if(header.syn && !_isn.has_value()){
         // received syn from peer and _syn status is false
+        _isn = header.seqno;
         // make the connection
-        _isn = static_cast<WrappingInt32>(rand());
-        _checkpoint = static_cast<uint64_t>(header.seqno.raw_value()) + 1;
+        // _checkpoint = static_cast<uint64_t>(header.seqno.raw_value()) + 1;
     }
+    if(_isn.has_value()){
+        WrappingInt32 currentseqno = header.seqno;
+        WrappingInt32 writtenbyte = WrappingInt32(_reassembler.firstunassemble() + _reassembler.stream_out().bytes_written());
+        uint64_t index = unwrap(currentseqno,_isn.value(),writtenbyte.raw_value()) + header.syn - 1;
+        _reassembler.push_substring(buffer.copy(),index,header.fin);
+    }
+    
     // else if(_isn.has_value() && header.fin){
     //     // disconnection the TCP connection
     //     _isn = nullopt;
@@ -47,10 +55,11 @@ optional<WrappingInt32> TCPReceiver::ackno() const {
     else{
         // call wrap to get next byte
         // return {_isn.value()};
-        
+        return WrappingInt32(_reassembler.stream_out().bytes_written() + 1 + _reassembler.stream_out().input_ended() + _isn.value().raw_value());
     }
         // return {}; 
 }
 
 size_t TCPReceiver::window_size() const { 
-    return _capacity - _reassembler.firstunassemble(); }
+    // size_t unassemblebyte = _reassembler.firstunassemble();
+    return (_capacity  - _reassembler.stream_out().buffer_size()); }
