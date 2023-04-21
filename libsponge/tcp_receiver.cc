@@ -23,9 +23,29 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
     }
     if(_isn.has_value()){
         WrappingInt32 currentseqno = header.seqno;
-        WrappingInt32 writtenbyte = WrappingInt32(_reassembler.firstunassemble() + _reassembler.stream_out().bytes_written());
-        uint64_t index = unwrap(currentseqno,_isn.value(),writtenbyte.raw_value()) + header.syn - 1;
+        WrappingInt32 writtenbyte = WrappingInt32(_reassembler.firstunassemble() + _reassembler.stream_out().bytes_written()) + 1;
+        cout << "writtenbyte " << writtenbyte.raw_value() << endl;
+        cout << "Isn " << _isn.value() << endl;
+        cout << "header " << currentseqno.raw_value() << endl;
+        uint64_t index = unwrap(currentseqno,_isn.value(),writtenbyte.raw_value());\
+        cout << "index is " << index << endl;
+        if(index == 0 && !header.syn){
+            return ;
+        }
+        index += header.syn - 1;
+        // if(header.syn){
+        //     _reassembler.push_substring(buffer.copy(),0,header.fin);
+        //     return ;
+        // }
+        // if(index){
+        //     index += header.syn - 1;
+        //     _reassembler.push_substring(buffer.copy(),index,header.fin);
+        // }
+        // if(index)
+        //     index += header.syn - 1;
+        
         _reassembler.push_substring(buffer.copy(),index,header.fin);
+            
     }
     
     // else if(_isn.has_value() && header.fin){
