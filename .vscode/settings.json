@@ -58,6 +58,20 @@
         "regex": "cpp",
         "typeindex": "cpp",
         "valarray": "cpp",
-        "charconv": "cpp"
+        "charconv": "cpp",
+        "csetjmp": "cpp",
+        "csignal": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp",
+        "complex": "cpp",
+        "condition_variable": "cpp",
+        "cuchar": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "filesystem": "cpp",
+        "set": "cpp",
+        "future": "cpp",
+        "mutex": "cpp",
+        "shared_mutex": "cpp"
     }
 }

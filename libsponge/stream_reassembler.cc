@@ -65,6 +65,9 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
     if(eof == true){
         _lasteofbyte = data.size() + index;
     }
+    if(index > _lastbyteassemble && index - _lastbyteassemble > _capacity){
+        return ;
+    }// too large to write in 
     // index has been record
     if(index < _lastbyteassemble && index + data.size() <= _lastbyteassemble){
         // this->_writeintoBytestream();

@@ -14,7 +14,7 @@ using namespace std;
 void TCPReceiver::segment_received(const TCPSegment &seg) {
     const TCPHeader & header = seg.header();
     const Buffer & buffer = seg.payload();
-    cout <<"string is " << buffer.copy() << " header is " << header.syn << endl;
+    // cout <<"string is " << buffer.copy() << " header is " << header.syn << endl;
     if(header.syn && !_isn.has_value()){
         // received syn from peer and _syn status is false
         _isn = header.seqno;
@@ -24,14 +24,14 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
     if(_isn.has_value()){
         WrappingInt32 currentseqno = header.seqno;
         WrappingInt32 writtenbyte = WrappingInt32(_reassembler.firstunassemble() + _reassembler.stream_out().bytes_written()) + 1;
-        cout << "writtenbyte " << writtenbyte.raw_value() << endl;
-        cout << "Isn " << _isn.value() << endl;
-        cout << "header " << currentseqno.raw_value() << endl;
+        // cout << "writtenbyte " << writtenbyte.raw_value() << endl;
+        // cout << "Isn " << _isn.value() << endl;
+        // cout << "header " << currentseqno.raw_value() << endl;
         uint64_t index = unwrap(currentseqno,_isn.value(),writtenbyte.raw_value());\
-        cout << "index is " << index << endl;
-        if(index == 0 && !header.syn){
-            return ;
-        }
+        // cout << "index is " << index << endl;
+        // if(index == 0 && !header.syn){
+        //     return ;
+        // }
         index += header.syn - 1;
         // if(header.syn){
         //     _reassembler.push_substring(buffer.copy(),0,header.fin);
